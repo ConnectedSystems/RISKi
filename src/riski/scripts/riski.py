@@ -1,15 +1,16 @@
+'''Command-line utility for RISKi'''
 
-
-from riski._utils import load_settings
-import typer
 import glob
 import subprocess
+import os
 
+import typer
 
+from riski._utils import load_settings
 
-load_settings
 
 app = typer.Typer()
+
 
 @app.command()
 def setup_dev_db(settings_file: str):
@@ -22,9 +23,6 @@ def setup_dev_db(settings_file: str):
 
     psql = settings['database']['psql']
     dev_settings = settings['database']['dev']
-
-
-    print(psql)
 
     # Find user creation script
     user_script = "create-users.sql"
@@ -41,20 +39,26 @@ def setup_dev_db(settings_file: str):
     user = dev_settings['user']
     pw = dev_settings['password']
 
-    # base_cmd = f"{psql} -h localhost -d {dbname} -U {user} < "
-    subprocess.run(f"SET PGPASSWORD={pw}", shell=True)
-    base_cmd = [psql, f"-d {dbname}", f"-U {user}", "<"]
+    if 'PGPASSWORD' not in os.environ:
+        os.environ['PGPASSWORD'] = pw
 
-    cmd = base_cmd + [f"{user_creator}"]
-    print(cmd)
-    # subprocess.run(cmd)
+    base_cmd = [psql, f"-U{user}", f"-d{dbname}"]
+    cmd = base_cmd + [f"-f{user_creator}"]
+    subprocess.run(cmd)
 
     # files should be ordered...
     for script in sql_files:
-        cmd = base_cmd + [f"{script}"]
-        # subprocess.run(cmd)
-        print("would have called", cmd)
+        cmd = base_cmd + [f"-f{script}"]
+        subprocess.run(cmd)
 
 
-if __name__ == "__main__":
+@app.command()
+def test():
+    print("yes")
+
+def main():
+    app()
+
+
+if __name__ == '__main__':
     app()
