@@ -56,6 +56,8 @@ class RDLConnection(object):
             conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
             self.conn = pg.connect(conn_string)
 
+            print("Connected to local dev server")
+
 
     def _create_temp_table(self, struct):
         """Create a temporary table for the data import.
@@ -125,6 +127,7 @@ class RDLConnection(object):
     def run_query(self, query):
         with self.conn.cursor() as cur:
             cur.execute(query)
+            # print(cur.rowcount, "rows inserted")
 
         return self
 
