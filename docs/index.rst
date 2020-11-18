@@ -1,8 +1,8 @@
 =============
-rdl_interface
+RISKi
 =============
 
-This is the documentation of **rdl_interface**.
+This is the documentation for **RISKi**.
 
 .. note::
 
@@ -32,6 +32,7 @@ Contents
    License <license>
    Authors <authors>
    Changelog <changelog>
+   Development Setup <devsetup>
    Module Reference <api/modules>
 
 
