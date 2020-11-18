@@ -12,21 +12,36 @@ import ipdb
 
 class RDLConnection(object):
 
-    def __init__(self, settings_fn, tmp_table='tablename', debug=False):
+    def __init__(self, settings: str, tmp_table: str = 'tablename', dev: bool = False):
+        """Constructor for RDLConnection.
+
+        Parameters
+        ----------
+        settings : str,
+            Path to settings file in yaml format.
+
+        tmp_table : str (default: 'tablename'),
+            name of temporary table to use
+        
+        dev : bool (default: False),
+            Whether to use local development server or not.
+
+        """
 
         # Load in settings
-        self.settings = load_settings(settings_fn)
-
-        rdl_db_settings = self.settings['database']['rdl']
-        conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
-
+        self.settings = load_settings(settings)
         self.tmp_table = tmp_table
 
-        if not debug:
-            # Establish connection
+        # Establish connection to DB
+        if not dev:
+            rdl_db_settings = self.settings['database']['rdl']
+            conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
+
             self.conn = pg.connect(conn_string)
         else:
-            self.conn = False
+            rdl_db_settings = self.settings['database']['dev']
+            conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
+            self.conn = pg.connect(conn_string)
 
     def _create_temp_table(self, struct):
         """Create a temporary table for the data import.
@@ -47,7 +62,7 @@ class RDLConnection(object):
         with self.conn.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS {}".format(self.tmp_table))
     
-    def insert_csv_data(self, csv_fn:str):
+    def insert_csv_data(self, csv_fn: str):
         """Insert CSV data into temporary table.
 
         Parameters
@@ -96,8 +111,12 @@ class RDLConnection(object):
             return '%i'
         elif form.startswith('s'):
             return '%s'
+        else:
+            raise ValueError(f"Unknown data type: {form}")
 
     def __del__(self):
+        # Clean up on destruction
+
         self._remove_temp_table()  # remove table if exists
         self.conn.close()  # close connection
 
