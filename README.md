@@ -1,6 +1,6 @@
 # RISKi - The [Risk] Data Library [i]nterface
 
-An experimental package that provides a consistent programmatic front-end to interact with the Risk Data Library.
+An in-development package that provides a consistent programmatic front-end to interact with the Risk Data Library.
 
 
 # Setup
