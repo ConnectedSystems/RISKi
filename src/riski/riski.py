@@ -8,13 +8,16 @@ import numpy as np
 import pandas.io.sql as psql
 import pandas as pd
 
+from types import MethodType
+import inspect
 
 from ._utils import load_settings
+from . import _json_funcs
 
 
 class RDLConnection(object):
 
-    def __init__(self, settings: str, tmp_table: str = 'tablename', dev: bool = False):
+    def __init__(self, settings: str, tmp_table: str = None, dev: bool = False, verbose=True):
         """Constructor for RDLConnection.
 
         Parameters
@@ -29,10 +32,10 @@ class RDLConnection(object):
             Whether to use local development server or not.
 
         """
-
         # Load in settings
         self.settings = load_settings(settings)
-        self.tmp_table = tmp_table
+
+        self.verbose = verbose
 
         # Establish connection to DB
         if not dev:
@@ -47,16 +50,23 @@ class RDLConnection(object):
             conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
             self.conn = pg.connect(conn_string)
 
-            # conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
-            # self.conn = create_engine(conn_string)
-
-
         else:
             rdl_db_settings = self.settings['database']['dev']
+            rdl_db_settings.pop('psql')  # remove psql entry as it is unneeded for the below
             conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
             self.conn = pg.connect(conn_string)
 
-            print("Connected to local dev server")
+            self._verbose_msg("Connected to local dev server")
+
+        if tmp_table is None:
+            self.tmp_table = self.settings['database']['tmp_table']
+        else:
+            self.tmp_table = tmp_table
+        
+        # Dynamically attach additional methods
+        funcs = inspect.getmembers(_json_funcs, inspect.isfunction)
+        for name, func in funcs:
+            setattr(self, name, MethodType(func, self))
 
 
     def _create_temp_table(self, struct):
@@ -67,16 +77,22 @@ class RDLConnection(object):
         struct : List[tuple],
             Table column structure in the form of [("column name", "data type"), ]
         """
+        self._remove_temp_table()  # remove table if it already exists
+
         columns = ",\n".join([f"{k} {v}" for k, v in struct])
         query = """CREATE TABLE {}({})""".format(self.tmp_table, columns)
 
         with self.conn.cursor() as cur:
             cur.execute(query)
 
+        self.conn.commit()
+
     def _remove_temp_table(self):
         """Deletes temporary table from database."""
         with self.conn.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS {}".format(self.tmp_table))
+
+        self.conn.commit()
     
     def insert_csv_data(self, csv_fn: str):
         """Insert CSV data into temporary table.
@@ -92,42 +108,35 @@ class RDLConnection(object):
         self._ensure_location(columns)
 
         # Extract datatype from DataFrame and strip numbers
-        dtypes = tmp_df.dtypes.astype('string').tolist()
+        dtypes = tmp_df.dtypes.astype(str).tolist()
         dtypes = [re.sub('[0-9]+', '', d).replace('int', 'integer') for d in dtypes]
 
-        struct = list(zip(columns, dtypes))
+        if len(dtypes) == 0:
+            raise ValueError("Could not determine data types!")
 
+        struct = list(zip(columns, dtypes))
         self._create_temp_table(struct)
 
-        st = [self._str_type(v) for k, v in struct]
-
-        if len(st) == 0:
-            raise ValueError("Empty structure for CSV (could not determine data types)")
-
-        generated = ', '.join(st)
         columns = ', '.join(columns)
 
         with np.printoptions(threshold=np.inf):
-            values = str(tmp_df.to_records(index=False)).replace('[', '').replace(']', '').replace('\n', ',\n')
+            # strip square brackets [] and add commas to end of lines
+            values = str(tmp_df.to_records(index=False))[1:-1].replace('\n', ',\n')
 
         query = f"INSERT INTO {self.tmp_table}({columns}) VALUES {values}"
 
         with self.conn.cursor() as cur:
             cur.execute(query)
+            self._verbose_msg(f"Inserted {cur.rowcount} rows")
+
+        self.conn.commit()
 
         return self
 
-    def import_data(self):
-        # insert data into temp table
-        # generate JSON file describing data
-        # 
-        # Incorporate rdl-data scripts or simply do a subprocess call?
-        pass
-
     def run_query(self, query):
+        """Run an arbitrary SQL query."""
         with self.conn.cursor() as cur:
             cur.execute(query)
-            # print(cur.rowcount, "rows inserted")
 
         return self
 
@@ -158,9 +167,17 @@ class RDLConnection(object):
 
         raise ValueError("Provided CSV does not specify LocID, lon, or lat\n{}".format(columns))
 
+    def _verbose_msg(self, msg):
+        if self.verbose:
+            print(msg)
+
     def __del__(self):
         # Clean up on destruction
+        self._remove_temp_table()  # remove table if exists
+        self.conn.close()  # close connection
 
+    def __exit__(self):
+        # Clean up on exit
         self._remove_temp_table()  # remove table if exists
         self.conn.close()  # close connection
 
