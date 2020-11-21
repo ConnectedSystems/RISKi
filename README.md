@@ -21,23 +21,38 @@ These are being finalized but at a minimum:
 
 ```yaml
 database:
+
+  # Production server details
   rdl:
     dbname: rdl
     user: user
     password: password
     host: hostname
     port: 1234
+
+  # The temporary table to create and upload data to 
+  tmp_table: public.test_table
 ```
 
+### Programmatic Usage
 
 ```python
 import riski as ri
 
-csv_fn = "data/CSVs/SWIO_COM_EQ_Shake_RP.csv"
-r_conn = ri.RDLConnection(".settings.yaml", debug=True)
+r_conn = ri.RDLConnection(".settings.yaml", dev=True)
 
+csv_fn = "data/CSVs/SWIO_COM_EQ_Shake_RP.csv"
 r_conn.insert_csv_data(csv_fn)
 ```
+
+
+### As a command-line tool:
+
+```bash
+# To import hazard data
+$ riski import-hazard .settings.yaml some_data.csv metadata.json
+```
+
 
 
 # Note
