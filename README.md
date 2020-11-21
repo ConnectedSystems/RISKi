@@ -57,16 +57,25 @@ rdl-data:
   hazard: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db/hazard'  
 ```
 
+Generate config files for rdl-data
+
+```bash
+$ riski create-rdl-data-config .settings.yaml
+```
+
 ### Programmatic Usage
 
 ```python
 import riski as ri
 
-r_conn = ri.RDLConnection(".settings.yaml", dev=True)
+r_conn = ri.RDLConnection(".settings.yaml")
 
 csv_fn = "data/CSVs/SWIO_COM_EQ_Shake_RP.csv"
-r_conn.insert_csv_data(csv_fn)
+json_fn = "some_preformatted_metadata.json"
+
+r_conn.import_hazard_event(csv_fn, json_fn)
 ```
+
 
 ### As a command-line tool:
 
