@@ -1,6 +1,9 @@
 from typing import Dict
 
+from os.path import join as pj
+
 import yaml
+import json
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -24,3 +27,50 @@ def load_settings(fn: str) -> Dict:
         settings = yaml.load(fp, Loader=Loader)
     
     return settings
+
+
+def generate_config(settings: str, dev: bool = False):
+    """rdl-data interface - generate dictionary configuration.
+
+    TODO: Move this function elsewhere...
+    """
+
+    settings = load_settings(settings)
+
+    schema_settings = settings['schemas']
+    db_settings = settings['database']
+
+    if not dev:
+        db_settings = db_settings['rdl']
+    else:
+        db_settings = db_settings['dev']
+
+
+    # target path
+    cf = settings['rdl-data']['challenge']
+
+    for schema_name, config in schema_settings.items():
+        path = pj(cf, schema_name, 'db_settings.py')
+
+        tp = {
+            f'{schema_name}_reader': {
+                'NAME': db_settings['dbname'],
+                'USER': db_settings['user'],
+                'PASSWORD': db_settings['password'],
+                'HOST': db_settings['host'],
+                'PORT': db_settings['port'],
+                'OPTIONS': config['OPTIONS']
+            },
+            f'{schema_name}_contrib': {
+                'NAME': db_settings['dbname'],
+                'USER': db_settings['user'],
+                'PASSWORD': db_settings['password'],
+                'HOST': db_settings['host'],
+                'PORT': db_settings['port'],
+                'OPTIONS': config['OPTIONS']
+            }
+        }
+
+        with open(pj(cf, schema_name, 'db_settings.py'), 'w') as fp:
+            fp.write('db_confs = '+json.dumps(tp, indent=4))
+    
