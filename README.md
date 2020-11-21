@@ -32,6 +32,29 @@ database:
 
   # The temporary table to create and upload data to 
   tmp_table: public.test_table
+
+# Schema specific options
+schemas:
+  loss:
+    OPTIONS:
+      sslmode: require   # set to `prefer` for dev server
+
+  hazard:
+    OPTIONS:
+      sslmode: require
+
+  ged4all:
+    OPTIONS:
+      sslmode: require
+
+# This is the location of the rdl-data project directories
+# To avoid confusion, use absolute paths
+# Don't forget the last slash! ('/')
+rdl-data:
+  sql: 'C:/programs/ownCloud/projects/rdl-data/sql'
+  python: 'C:/programs/ownCloud/projects/rdl-data/python'
+  challenge: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db'
+  hazard: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db/hazard'  
 ```
 
 ### Programmatic Usage
@@ -45,14 +68,17 @@ csv_fn = "data/CSVs/SWIO_COM_EQ_Shake_RP.csv"
 r_conn.insert_csv_data(csv_fn)
 ```
 
-
 ### As a command-line tool:
 
 ```bash
-# To import hazard data
+# Generating config files for rdl-data
+$ riski create-rdl-data-config .settings.yaml
+
+# Edit JSON metadata file as needed
+
+# Import hazard data
 $ riski import-hazard .settings.yaml some_data.csv metadata.json
 ```
-
 
 
 # Note
