@@ -8,7 +8,6 @@ def test_insertion():
     r_conn = ri.RDLConnection(".settings.yaml", dev=True)
 
     r_conn.insert_csv_data(csv_fn)
-    # r_conn.run_query("SELECT * FROM tablename")
 
 
 if __name__ == '__main__':
