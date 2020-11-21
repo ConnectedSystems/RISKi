@@ -37,7 +37,7 @@ This can be different from the `postgres` user password.
 
 ## Server and Database creation
 
-Here is a step-by-step guide for Windows:
+Here is a step-by-step guide for Windows.
 
 1. Open pgAdmin
 2. Right-click on "Servers" on the left-hand panel and select "Create Server"
@@ -84,10 +84,34 @@ database:
     host: localhost
     port: 5432
 
-  # Location of the psql.exe file
-  psql: C:/Program Files/PostgreSQL/13/bin/psql.exe
+    # Location of the psql.exe file
+    psql: C:/Program Files/PostgreSQL/13/bin/psql.exe
+
+  rdl:
+    # Put config for production database here 
+    dbname: rdl-data  # this is the database name you provided
+    user: testuser
+    password: meowmeowbeans
+    host: localhost
+    port: 5432
+
+# Schema specific options
+schemas:
+  loss:
+    OPTIONS:
+      sslmode: require   # set to `prefer` for dev server
+
+  hazard:
+    OPTIONS:
+      sslmode: require
+
+  ged4all:
+    OPTIONS:
+      sslmode: require
 
 # This is the location of the rdl-data project directories
+# To avoid confusion, use absolute paths
+# Don't forget the last slash! ('/')
 rdl-data:
   sql: 'C:/programs/ownCloud/projects/rdl-data/sql'
   python: 'C:/programs/ownCloud/projects/rdl-data/python'
@@ -95,10 +119,17 @@ rdl-data:
   hazard: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db/hazard'
 ```
 
-
-
 ### Run script to create database
 
 ```bash
 riski setup-dev-db .settings.yaml
+```
+
+Errors will occur as the provided SQL scripts appear to be for a mix of database versions.
+(e.g. `public.geometry` does not appear to be created)
+
+### Run script to generate config files for rdl-data
+
+```bash
+riski create-rdl-data-config .settings.yaml
 ```
