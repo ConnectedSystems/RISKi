@@ -1,23 +1,27 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
+from types import MethodType
+import warnings
 
+import os
 import re
+import inspect
+
 import psycopg2 as pg
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 import numpy as np
 import pandas.io.sql as psql
 import pandas as pd
 
-from types import MethodType
-import inspect
-
 from ._utils import load_settings
-from . import _json_funcs
+from . import _json_funcs, _xml_funcs, _local_export
 
 
 class RDLConnection(object):
 
-    def __init__(self, settings: str, tmp_table: str = None, dev: bool = False, verbose=True):
+    def __init__(self, settings: str, tmp_table: str = None, dev: bool = False, 
+                 db_name: Optional[str] = None, verbose=True):
         """Constructor for RDLConnection.
 
         Parameters
@@ -37,26 +41,16 @@ class RDLConnection(object):
 
         self.verbose = verbose
 
-        # Establish connection to DB
-        if not dev:
-            rdl_db_settings = self.settings['database']['rdl']
+        if dev:
+            warnings.warn("Dev parameter deprecated. Specify `db_name` instead.")
+            db_name = 'dev'
 
-            user = rdl_db_settings['user']
-            password = rdl_db_settings['password']
-            host = rdl_db_settings['host']
-            port = rdl_db_settings['port']
-            dbname = rdl_db_settings['dbname']
+        if (db_name is None) and (dev is False):
+            warnings.warn("In future, must specify `db_name`. Defaulting to 'rdl'.")
+            db_name = 'rdl'
 
-            conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
-            self.conn = pg.connect(conn_string)
-
-        else:
-            rdl_db_settings = self.settings['database']['dev']
-            rdl_db_settings.pop('psql')  # remove psql entry as it is unneeded for the below
-            conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
-            self.conn = pg.connect(conn_string)
-
-            self._verbose_msg("Connected to local dev server")
+        # Create settings for DB entry
+        self.switch_db(db_name)
 
         if tmp_table is None:
             self.tmp_table = self.settings['database']['tmp_table']
@@ -65,9 +59,44 @@ class RDLConnection(object):
         
         # Dynamically attach additional methods
         funcs = inspect.getmembers(_json_funcs, inspect.isfunction)
+        funcs += inspect.getmembers(_xml_funcs, inspect.isfunction)
+        funcs += inspect.getmembers(_local_export, inspect.isfunction)
         for name, func in funcs:
             setattr(self, name, MethodType(func, self))
 
+    def switch_db(self, name: str):
+        assert name in list(self.settings['database'].keys()), \
+            "DB name/config not listed in settings file"
+
+        rdl_db_settings = self.settings['database'][name]
+
+        if name == 'dev':
+            # remove psql entry as it is unneeded
+            rdl_db_settings.pop('psql')
+            self._verbose_msg("Connected to local dev server")
+        
+        user = rdl_db_settings['user']
+        password = rdl_db_settings['password']
+        host = rdl_db_settings['host']
+        port = rdl_db_settings['port']
+        dbname = rdl_db_settings['dbname']
+
+        conn_string = " ".join([f"{k}='{v}'" for (k, v) in rdl_db_settings.items()])
+        self.conn = pg.connect(conn_string)
+
+        # sqlalchemy connection string
+        engine_conn = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
+        self.engine = create_engine(engine_conn)
+
+        self.engine_conn = engine_conn
+
+        # OS environment variable to interface with rdl-infra
+        os.environ["POSTGRES_CONNECTION_STRING"] = conn_string
+
+    def create_db(self):
+        from riski.schema import Base
+        
+        Base.metadata.create_all(bind=self.engine)
 
     def _create_temp_table(self, struct):
         """Create a temporary table for the data import.
@@ -135,10 +164,15 @@ class RDLConnection(object):
 
     def run_query(self, query):
         """Run an arbitrary SQL query."""
-        with self.conn.cursor() as cur:
-            cur.execute(query)
+        # with self.conn.cursor() as cur:
+        #     cur.execute(query)
+        #     columns = [desc[0] for desc in cur.description]
+        #     ret = cur.fetchall()
+        #     data = pd.DataFrame(ret, columns=columns)
 
-        return self
+        data = psql.read_sql_query(query, self.conn)
+
+        return data
 
     def _str_type(self, form: str):
         """Interpret string to printf-style data type.
@@ -173,12 +207,12 @@ class RDLConnection(object):
 
     def __del__(self):
         # Clean up on destruction
-        self._remove_temp_table()  # remove table if exists
+        # self._remove_temp_table()  # remove table if exists
         self.conn.close()  # close connection
 
     def __exit__(self):
         # Clean up on exit
-        self._remove_temp_table()  # remove table if exists
+        # self._remove_temp_table()  # remove table if exists
         self.conn.close()  # close connection
 
 

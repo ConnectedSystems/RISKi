@@ -29,4 +29,4 @@ def import_hazard_json(self, json_metadata_fn: str):
 def import_hazard_event(self, csv_fn, json_fn):
     self.insert_csv_data(csv_fn)
     self.import_hazard_json(json_fn)
-    # self._remove_temp_table()
+    self._remove_temp_table()

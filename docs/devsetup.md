@@ -112,11 +112,12 @@ schemas:
 # This is the location of the rdl-data project directories
 # To avoid confusion, use absolute paths
 # Don't forget the last slash! ('/')
+# (a long-term goal is to make this no longer required)
 rdl-data:
-  sql: 'C:/programs/ownCloud/projects/rdl-data/sql'
-  python: 'C:/programs/ownCloud/projects/rdl-data/python'
-  challenge: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db'
-  hazard: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db/hazard'
+  sql: 'C:/example/rdl-data/sql/'
+  python: 'C:/example/rdl-data/python/'
+  challenge: 'C:/example/rdl-data/challenge_fund_db/'
+  hazard: 'C:/example/rdl-data/challenge_fund_db/hazard/'
 ```
 
 ### Run script to create database

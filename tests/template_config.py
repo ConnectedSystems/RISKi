@@ -1,3 +1,5 @@
+"""Incomplete - only to showcase possible approach to JSON template editing."""
+
 from riski._utils import load_settings
 import typer
 import glob

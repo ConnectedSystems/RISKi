@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 
 from os.path import join as pj
 
@@ -29,22 +29,16 @@ def load_settings(fn: str) -> Dict:
     return settings
 
 
-def generate_config(settings: str, dev: bool = False):
+def generate_config(settings: Union[str, Dict], db_name: str):
     """rdl-data interface - generate dictionary configuration.
 
     TODO: Move this function elsewhere...
     """
-
-    settings = load_settings(settings)
+    if isinstance(settings, str):
+        settings = load_settings(settings)
 
     schema_settings = settings['schemas']
-    db_settings = settings['database']
-
-    if not dev:
-        db_settings = db_settings['rdl']
-    else:
-        db_settings = db_settings['dev']
-
+    db_settings = settings['database'][db_name]
 
     # target path
     cf = settings['rdl-data']['challenge']
