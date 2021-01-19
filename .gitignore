@@ -50,3 +50,7 @@ MANIFEST
 .venv*/
 
 tests/.settings.yaml
+
+.vscode/
+
+workspace.code-workspace
