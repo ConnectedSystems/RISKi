@@ -1,7 +1,13 @@
 # RISKi - The [Risk] Data Library [i]nterface
 
-An in-development package that provides a consistent programmatic front-end to interact with the Risk Data Library.
+An in-development package that provides a consistent programmatic framework for the Risk Data Library.
 
+For historic reasons, the current implementation depends on:
+
+* rdl-data
+* rdl-infra (for local development)
+
+Work is in process to slowly replace the functionality provided by these packages.
 
 # Setup
 
@@ -10,12 +16,15 @@ The end goal is to make this a `pip` installable package.
 For now, however, clone the repository and run:
 
 ```bash
-pip install -e .
+$ conda create -n gfdrr-rdl --file windows_env.yml
+$ pip install -e .
 ```
 
 # Usage example
 
 Create a `.settings.yaml` file specifying connection details.
+
+This provides backwards compatibility with the `rdl-*` packages where needed.
 
 These are being finalized but at a minimum:
 
@@ -50,11 +59,12 @@ schemas:
 # This is the location of the rdl-data project directories
 # To avoid confusion, use absolute paths
 # Ending slashes ('/') are recommended
+# (a long-term goal is to make this no longer required)
 rdl-data:
-  sql: 'C:/programs/ownCloud/projects/rdl-data/sql/'
-  python: 'C:/programs/ownCloud/projects/rdl-data/python/'
-  challenge: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db/'
-  hazard: 'C:/programs/ownCloud/projects/rdl-data/challenge_fund_db/hazard/'
+  sql: C:/example/rdl-data/sql/
+  python: C:/example/rdl-data/python/
+  challenge: C:/example/rdl-data/challenge_fund_db/
+  hazard: C:/example/rdl-data/challenge_fund_db/hazard/
 ```
 
 Generate config files for rdl-data
@@ -81,12 +91,13 @@ r_conn.import_hazard_event(csv_fn, json_fn)
 
 ```bash
 # Generating config files for rdl-data
-$ riski create-rdl-data-config .settings.yaml
+# Format is: riski [command] [database name]
+$ riski create-rdl-data-config dev
 
 # Edit JSON metadata file as needed
 
 # Import hazard data
-$ riski import-hazard .settings.yaml some_data.csv metadata.json
+$ riski import-hazard dev some_data.csv metadata.json
 ```
 
 
@@ -94,3 +105,10 @@ $ riski import-hazard .settings.yaml some_data.csv metadata.json
 
 This project has been set up using PyScaffold 3.2.3. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
+
+
+## Errors
+
+On Windows, you may run into an error: `FileNotFoundError: Could not find module '... geos_c.dll' (or one of its dependencies). Try using the full path with constructor syntax.'`
+
+This is caused by, we think, shapely not including the referenced `.dll` file in its installation (via pip). The (temporary) solution is to copy the `.dll` into the expected location.
