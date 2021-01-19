@@ -22,7 +22,7 @@ $ pip install -e .
 
 # Usage example
 
-Create a `.settings.yaml` file specifying connection details.
+Create a `.settings.yaml` file specifying DB connection details.
 
 This provides backwards compatibility with the `rdl-*` packages where needed.
 
@@ -31,8 +31,9 @@ These are being finalized but at a minimum:
 ```yaml
 database:
 
-  # Production server details
-  rdl:
+  # development server details 
+  # (can put in multiple entries)
+  dev:
     dbname: rdl
     user: user
     password: password
@@ -70,15 +71,23 @@ rdl-data:
 Generate config files for rdl-data
 
 ```bash
-$ riski create-rdl-data-config .settings.yaml
+$ riski create-rdl-data-config dev
 ```
 
 ### Programmatic Usage
 
 ```python
+# Create schema on local DB
 import riski as ri
 
-r_conn = ri.RDLConnection(".settings.yaml")
+r_conn = ri.RDLConnection(".settings.yaml", db_name='dev')
+r_conn.create_schema()
+```
+
+```python
+import riski as ri
+
+r_conn = ri.RDLConnection(".settings.yaml", db_name='dev')
 
 csv_fn = "data/CSVs/SWIO_COM_EQ_Shake_RP.csv"
 json_fn = "some_preformatted_metadata.json"

@@ -93,7 +93,7 @@ class RDLConnection(object):
         # OS environment variable to interface with rdl-infra
         os.environ["POSTGRES_CONNECTION_STRING"] = conn_string
 
-    def create_db(self):
+    def create_schema(self):
         from riski.schema import Base
         
         Base.metadata.create_all(bind=self.engine)

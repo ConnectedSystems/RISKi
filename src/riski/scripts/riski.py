@@ -18,7 +18,7 @@ r_conn = ri.RDLConnection(".settings.yaml", db_name='dev')
 @app.command()
 def setup_dev_db():
     r_conn.switch_db('dev')
-    r_conn.create_db()
+    r_conn.create_schema()
 
 @app.command()
 def create_rdl_data_config(db_name: str):
