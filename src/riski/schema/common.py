@@ -19,7 +19,7 @@ OccupancyEnum = enum.Enum('occupancy_enum', [
     ("Crop", "Crop"),
     ("Livestock", "Livestock"),
     ("Forestry", "Forestry"),
-    ("Mixed", "Mixed")
+    ("Mixed occupancy", "Mixed occupancy")
 ])
 
 
@@ -63,4 +63,15 @@ class HazardType(Base):
 
     code = Column(VARCHAR, primary_key=True)
 
+    name = Column(VARCHAR, nullable=False)
+
+
+class ISO(Base):
+    __tablename__ = 'iso'
+    __table_args__ = ({"schema": "common"})
+
+    # ISO 3166 ALPHA-3 country code
+    code = Column(VARCHAR, primary_key=True)
+
+    # Country name (in English)
     name = Column(VARCHAR, nullable=False)
