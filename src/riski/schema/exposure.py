@@ -55,8 +55,10 @@ class Contribution(Base):
     version = Column(VARCHAR)
     purpose = Column(Text)
     project = Column(VARCHAR)
+    country_iso = Column(VARCHAR, nullable=False, ForeignKey('common.iso.code'))
     contributed_at = Column(DateTime, nullable=False)
     license_code = Column(VARCHAR, ForeignKey("common.license.code"), nullable=False)
+    published = Column(Boolean, default=True)
 
 
 class ModelCostType(Base):

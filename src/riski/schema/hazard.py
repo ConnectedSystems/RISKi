@@ -20,8 +20,10 @@ class Contribution(Base):
     version = Column(VARCHAR)
     purpose = Column(Text)
     project = Column(VARCHAR)
+    country_iso = Column(VARCHAR, nullable=False, ForeignKey('common.iso.code'))
     contributed_at_timestamp = Column(DateTime, nullable=False)
     license_code = Column(VARCHAR, ForeignKey("common.license.code"))
+    published = Column(Boolean, default=True)
 
     children = relationship("EventSet")
 
@@ -40,7 +42,7 @@ class EventSet(Base):
     time_end = Column(DateTime)
     time_duration = Column(Interval)
     description = Column(Text)
-    bibliography = Column(Text)
+    bibliography = Column(Text)  # to be moved to contribution table
     is_prob = Column(Boolean, nullable=False)
 
     children = relationship("Event")

@@ -11,4 +11,3 @@ event.listen(Base.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS ex
 event.listen(Base.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS hazard"))
 event.listen(Base.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS loss"))
 event.listen(Base.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS vulnerability"))
-
