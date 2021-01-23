@@ -72,7 +72,10 @@ class RDLConnection(object):
 
         if name == 'dev':
             # remove psql entry as it is unneeded
-            rdl_db_settings.pop('psql')
+            # this will eventually be removed in the future as direct 
+            # interaction via the command-line will not be needed 
+            rdl_db_settings.pop('psql', None)
+            
             self._verbose_msg("Connected to local dev server")
         
         user = rdl_db_settings['user']
@@ -208,11 +211,18 @@ class RDLConnection(object):
     def __del__(self):
         # Clean up on destruction
         # self._remove_temp_table()  # remove table if exists
-        self.conn.close()  # close connection
+
+        try:
+            self.conn.close()  # close connection
+        except AttributeError:
+            pass
 
     def __exit__(self):
         # Clean up on exit
         # self._remove_temp_table()  # remove table if exists
-        self.conn.close()  # close connection
+        try:
+            self.conn.close()  # close connection
+        except AttributeError:
+            pass
 
 
