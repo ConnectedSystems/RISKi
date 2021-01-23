@@ -224,5 +224,3 @@ class RDLConnection(object):
             self.conn.close()  # close connection
         except AttributeError:
             pass
-
-
