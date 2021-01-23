@@ -32,6 +32,12 @@ def import_hazard(db_name: str, csv_fn: str, json_fn: str):
     r_conn.switch_db(db_name)
     r_conn.import_hazard_event(csv_fn, json_fn)
 
+@app.command()
+def import_hazard_exp(db_name: str, json_fn: str):
+    """Import experimental JSON format for hazard data type."""
+    r_conn.switch_db(db_name)
+    r_conn.import_updated_hazard_json(json_fn)
+
 
 @app.command()
 def import_exposure(db_name: str, csv_fn: str, xml_fn: str):
