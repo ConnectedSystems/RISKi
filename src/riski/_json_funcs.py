@@ -4,15 +4,15 @@ import sys
 import json
 from jsmin import jsmin
 
-import challenge_fund_db as cf
-from challenge_fund_db.hazard.generic_scenarios import JSONEventSet
-
 
 def import_hazard_json(self, json_metadata_fn: str):
     """Import data with structure defined in provided JSON metadata file.
 
     Interfaces with the existing `rdl-data` code to do this.
     """
+    import challenge_fund_db as cf
+    from challenge_fund_db.hazard.generic_scenarios import JSONEventSet
+
     self._verbose_msg(f"Reading meta-data file {json_metadata_fn}\n")
 
     metadata = {}
