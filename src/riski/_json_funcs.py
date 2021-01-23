@@ -2,6 +2,7 @@
 
 import sys
 import json
+from jsmin import jsmin
 
 import challenge_fund_db as cf
 from challenge_fund_db.hazard.generic_scenarios import JSONEventSet
