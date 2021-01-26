@@ -67,4 +67,3 @@ def generate_config(settings: Union[str, Dict], db_name: str):
 
         with open(pj(cf, schema_name, 'db_settings.py'), 'w') as fp:
             fp.write('db_confs = '+json.dumps(tp, indent=4))
-    
