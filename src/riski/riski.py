@@ -99,6 +99,7 @@ class RDLConnection(object):
     def create_schema(self):
         from riski.schema import Base
         
+        Base.metadata.drop_all(bind=self.engine)
         Base.metadata.create_all(bind=self.engine)
 
     def _create_temp_table(self, struct):
