@@ -1,0 +1,28 @@
+﻿hazard_code;code;name
+CF;FCF;Coastal Flood
+CF;FSS;Storm Surge
+CS;TOR;Tornado
+DR;DTA;Agricultural Drought
+DR;DTH;Hydrological Drought
+DR;DTM;Meteorological Drought
+DR;DTS;Socio-economic Drought
+EQ;Q1R;Primary Rupture
+EQ;Q2R;Secondary Rupture
+EQ;QGM;Ground Motion
+EQ;QLI;Liquefaction
+ET;ECD;Extreme cold
+ET;EHT;Extreme heat
+FL;FFF;Fluvial Flood
+FL;FPF;Pluvial Flood
+LS;LAV;Snow Avalanche
+LS;LSL;Landslide (general)
+TS;TSI;Tsunami
+VO;VAF;Ashfall
+VO;VBL;Ballistics
+VO;VFH;Proximal hazards
+VO;VLH;Lahar
+VO;VLV;Lava
+VO;VPF;Pyroclastic Flow
+WF;WFI;Wildfire
+WI;ETC;Extratropical cyclone
+WI;TCY;Tropical cyclone

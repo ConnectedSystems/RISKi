@@ -77,43 +77,49 @@ class ISO(Base):
     name = Column(VARCHAR, nullable=False)
 
 
+def load_data(filename):
+    import pathlib
+    import pandas as pd
+
+    here = str(pathlib.Path(__file__).parent.absolute())
+    data = pd.read_csv(here+f'/common_data/{filename}', sep=';').to_dict(orient='records')
+
+    return data
+
+
 def insert_ISOs(target, connection, **kwargs):
     """Callback function to pre-populate with ISO codes on creation.
     """
+    data = load_data("iso.csv")
+
     connection.execute(
         target.insert(),
-        {'code': 'MDG', 'name':'Madagascar'}
+        data
     )
 
 
 def insert_licenses(target, connection, **kwargs):
+    data = load_data("license.csv")
+
     connection.execute(
         target.insert(),
-        {'code': 'CC BY-SA 4.0', 
-         'name':'Creative Commons BY-SA 4.0', 
-         'notes': '', 
-         'url': ''
-        }
+        data
     )
 
 def insert_IMTs(target, connection, **kwargs):
+    data = load_data("imt.csv")
+
     connection.execute(
         target.insert(),
-        {'process_code': 'QGM',
-         'hazard_code': 'EQ',
-         'im_code': 'PGA:g',
-         'description': 'Peak ground acceleration in g',
-         'units': 'g'
-        }
+        data
     )
 
 def insert_process_types(target, connection, **kwargs):
+    data = load_data("process_type.csv")
+
     connection.execute(
         target.insert(),
-        {'code': 'QGM',
-         'hazard_code': 'EQ',
-         'name': 'Ground Motion',
-        }
+        data
     )
 
 
