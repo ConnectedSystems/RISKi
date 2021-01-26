@@ -42,7 +42,7 @@ class Contribution(Base):
     __tablename__ = 'Contribution'
     __table_args__ = ({"schema": "loss"})
 
-    contribution_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     loss_model_id = Column(Integer, ForeignKey('loss.loss_model.id'), nullable=False)
     model_source = Column(VARCHAR, nullable=False)
@@ -61,7 +61,7 @@ class LossModel(Base):
     __tablename__ = 'loss_model'
     __table_args__ = ({"schema": "loss"})
 
-    loss_model_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     name = Column(VARCHAR, nullable=False)
     description = Column(Text)
@@ -76,7 +76,7 @@ class LossMap(Base):
     __tablename__ = 'loss_map'
     __table_args__ = ({"schema": "loss"})
 
-    loss_map_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     loss_model_id = Column(Integer, ForeignKey('loss.loss_model.id'), nullable=False)
     occupancy = Column(Enum(OccupancyEnum), nullable=False)
@@ -91,7 +91,7 @@ class LossMapValues(Base):
     __tablename__ = 'loss_map_values'
     __table_args__ = ({"schema": "loss"})
 
-    loss_map_values_id = Column('id', BigInteger, primary_key=True, autoincrement=True)
+    id = Column('id', BigInteger, primary_key=True, autoincrement=True)
 
     loss_map_id = Column(Integer, ForeignKey('loss.loss_map.id'), nullable=False)
     asset_ref = Column(VARCHAR)
@@ -103,7 +103,7 @@ class LossCurveMap(Base):
     __tablename__ = 'loss_curve_map'
     __table_args__ = ({"schema": "loss"})
 
-    loss_curve_map_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     loss_model_id = Column(Integer, ForeignKey('loss.loss_model.id'), nullable=False)
     occupancy = Column(Enum(OccupancyEnum), nullable=False)
@@ -118,7 +118,7 @@ class LossCurveMapValues(Base):
     __tablename__ = 'loss_curve_map_values'
     __table_args__ = ({"schema": "loss"})
 
-    loss_curve_map_values_id = Column('id', BigInteger, primary_key=True, autoincrement=True)
+    id = Column('id', BigInteger, primary_key=True, autoincrement=True)
 
     loss_curve_map_id = Column(Integer, nullable=False)
     asset_ref = Column(VARCHAR)

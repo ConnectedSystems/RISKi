@@ -24,7 +24,7 @@ class ExposureModel(Base):
     __tablename__ = 'exposure_model'
     __table_args__ = ({"schema": "exposure"})
 
-    exposure_model_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     name = Column(VARCHAR, nullable=False)
     description = Column(VARCHAR)
@@ -46,7 +46,7 @@ class Contribution(Base):
     __tablename__ = 'contribution'
     __table_args__ = ({"schema": "exposure"})
 
-    contribution_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     exposure_model_id = Column(Integer, ForeignKey("exposure.exposure_model.id"), nullable=False)
     model_source = Column(VARCHAR, nullable=False)
@@ -65,7 +65,7 @@ class ModelCostType(Base):
     __tablename__ = 'model_cost_type'
     __table_args__ = ({"schema": "exposure"})
 
-    model_cost_type_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     exposure_model_id = Column(Integer, ForeignKey("exposure.exposure_model.id"), nullable=False)
     cost_type_name = Column(VARCHAR, nullable=False)
@@ -77,7 +77,7 @@ class Asset(Base):
     __tablename__ = 'asset'
     __table_args__ = ({"schema": "exposure"})
 
-    asset_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     exposure_model_id = Column(Integer, ForeignKey("exposure.exposure_model.id"), nullable=False)
     asset_ref = Column(VARCHAR, nullable=False)
@@ -92,7 +92,7 @@ class Cost(Base):
     __tablename__ = 'cost'
     __table_args__ = ({"schema": "exposure"})
 
-    cost_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     asset_id = Column(Integer, ForeignKey("exposure.asset.id"), nullable=False)
     cost_type_id = Column(Integer, ForeignKey("exposure.model_cost_type.id"), nullable=False)
@@ -105,7 +105,7 @@ class Occupancy(Base):
     __tablename__ = 'occupancy'
     __table_args__ = ({"schema": "exposure"})
 
-    occupancy_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     asset_id = Column(Integer, ForeignKey("exposure.asset.id"), nullable=False)
     period = Column(VARCHAR, nullable=False)
@@ -116,7 +116,7 @@ class Tags(Base):
     __tablename__ = 'tags'
     __table_args__ = ({"schema": "exposure"})
 
-    tag_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
 
     asset_id = Column(Integer, ForeignKey("exposure.asset.id"), nullable=False)
     name = Column(VARCHAR, nullable=False)
