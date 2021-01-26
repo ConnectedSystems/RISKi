@@ -1,9 +1,10 @@
 from sqlalchemy import (Column, String, Integer, Date, Enum, Float, Boolean,
                         DateTime, Interval, String, Text, ForeignKey, VARCHAR)
+
 from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry, Raster
 
-from .base import Base
+from .base import Base, LiberalBoolean
 
 
 # Schema Tables

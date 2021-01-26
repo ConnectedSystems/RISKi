@@ -6,7 +6,7 @@ from sqlalchemy import (Column, String, Integer, Date, Enum, Float, Boolean,
 from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry, Raster
 
-from .base import Base
+from .base import Base, LiberalBoolean
 from .common import OccupancyEnum
 
 
@@ -58,7 +58,7 @@ class Contribution(Base):
     country_iso = Column(VARCHAR, ForeignKey('common.iso.code'), nullable=False)
     contributed_at = Column(DateTime, nullable=False)
     license_code = Column(VARCHAR, ForeignKey("common.license.code"), nullable=False)
-    published = Column(Boolean, default=True)
+    published = Column(LiberalBoolean, default=True)
 
 
 class ModelCostType(Base):
