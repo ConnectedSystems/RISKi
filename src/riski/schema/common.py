@@ -1,12 +1,12 @@
 import enum
 
+from sqlalchemy import event
 from sqlalchemy import (Column, String, Integer, Date, Enum, Float, Boolean,
                         DateTime, Interval, String, Text, ForeignKey, VARCHAR)
 from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry, Raster
 
 from .base import Base
-
 
 OccupancyEnum = enum.Enum('occupancy_enum', [
     ("Residential", "Residential"),
@@ -75,3 +75,49 @@ class ISO(Base):
 
     # Country name (in English)
     name = Column(VARCHAR, nullable=False)
+
+
+def insert_ISOs(target, connection, **kwargs):
+    """Callback function to pre-populate with ISO codes on creation.
+    """
+    connection.execute(
+        target.insert(),
+        {'code': 'MDG', 'name':'Madagascar'}
+    )
+
+
+def insert_licenses(target, connection, **kwargs):
+    connection.execute(
+        target.insert(),
+        {'code': 'CC BY-SA 4.0', 
+         'name':'Creative Commons BY-SA 4.0', 
+         'notes': '', 
+         'url': ''
+        }
+    )
+
+def insert_IMTs(target, connection, **kwargs):
+    connection.execute(
+        target.insert(),
+        {'process_code': 'QGM',
+         'hazard_code': 'EQ',
+         'im_code': 'PGA:g',
+         'description': 'Peak ground acceleration in g',
+         'units': 'g'
+        }
+    )
+
+def insert_process_types(target, connection, **kwargs):
+    connection.execute(
+        target.insert(),
+        {'code': 'QGM',
+         'hazard_code': 'EQ',
+         'name': 'Ground Motion',
+        }
+    )
+
+
+event.listen(ISO.__table__, 'after_create', insert_ISOs)
+event.listen(License.__table__, 'after_create', insert_licenses)
+event.listen(IMT.__table__, 'after_create', insert_IMTs)
+event.listen(ProcessType.__table__, 'after_create', insert_process_types)
