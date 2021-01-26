@@ -8,11 +8,31 @@ from .base import Base, LiberalBoolean
 
 
 # Schema Tables
+class EventSet(Base):
+    __tablename__ = 'event_set'
+    __table_args__ = ({"schema": "hazard"})
+
+    id = Column('id', Integer, primary_key=True)
+
+    the_geom = Column(Geometry('POLYGON'), nullable=False)
+    geographic_area_name = Column(String, nullable=False)
+    creation_date = Column(Date, nullable=False)
+    hazard_type = Column(String, nullable=False)
+    time_start = Column(DateTime)
+    time_end = Column(DateTime)
+    time_duration = Column(Interval)
+    description = Column(Text)
+    bibliography = Column(Text)  # to be moved to contribution table
+    is_prob = Column(LiberalBoolean, nullable=False)
+
+    children = relationship("Event")
+
+
 class Contribution(Base):
     __tablename__ = 'contribution'
     __table_args__ = ({"schema": "hazard"})
 
-    contribution_id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     event_set_id = Column(Integer, ForeignKey('hazard.event_set.id'), nullable=False)
 
     model_source = Column(VARCHAR, nullable=False)
@@ -24,36 +44,16 @@ class Contribution(Base):
     country_iso = Column(VARCHAR, ForeignKey('common.iso.code'), nullable=False)
     contributed_at_timestamp = Column(DateTime, nullable=False)
     license_code = Column(VARCHAR, ForeignKey("common.license.code"))
-    published = Column(Boolean, default=True)
+    published = Column(LiberalBoolean, default=True)
 
-    children = relationship("EventSet")
-
-
-class EventSet(Base):
-    __tablename__ = 'event_set'
-    __table_args__ = ({"schema": "hazard"})
-
-    event_set_id = Column('id', Integer, primary_key=True)
-
-    the_geom = Column(Geometry, nullable=False)
-    geographic_area_name = Column(String, nullable=False)
-    creation_date = Column(Date, nullable=False)
-    hazard_type = Column(String, nullable=False)
-    time_start = Column(DateTime)
-    time_end = Column(DateTime)
-    time_duration = Column(Interval)
-    description = Column(Text)
-    bibliography = Column(Text)  # to be moved to contribution table
-    is_prob = Column(Boolean, nullable=False)
-
-    children = relationship("Event")
+    # children = relationship("EventSet")
 
 
 class Event(Base):
     __tablename__ = 'event'
     __table_args__ = ({"schema": "hazard"})
 
-    event_id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     event_set_id = Column(Integer, ForeignKey('hazard.event_set.id'))
 
     calculation_method = Column(Enum("INF", "SIM", "OBS", 
@@ -77,7 +77,7 @@ class FootprintSet(Base):
     __tablename__ = 'footprint_set'
     __table_args__ = ({"schema": "hazard"})
 
-    footprint_set_id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey('hazard.event.id'))
 
     process_type = Column(VARCHAR, nullable=False)
@@ -91,9 +91,8 @@ class Footprint(Base):
     __tablename__ = 'footprint'
     __table_args__ = ({"schema": "hazard"})
 
-    footprint_id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     footprint_set_id = Column(Integer, ForeignKey('hazard.footprint_set.id'))
-
     uncertainty_2nd_moment = Column(Float)
     trigger_footprint_id = Column(Integer)
 
@@ -104,9 +103,6 @@ class FootprintData(Base):
     __tablename__ = 'footprint_data'
     __table_args__ = ({"schema": "hazard"})
 
-    footprint_data_id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     footprint_id = Column(Integer, ForeignKey('hazard.footprint.id'))
-
-    raster = Column(Raster, nullable=False)
-    filename = Column(VARCHAR)
-
+    file_location = Column(VARCHAR, nullable=False)
