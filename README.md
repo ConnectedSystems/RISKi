@@ -104,7 +104,9 @@ $ riski setup-dev-db
 # Format is: riski [command] [database name]
 $ riski create-rdl-data-config dev
 
+# Create JSON metadata template for hazard data
 # Edit JSON metadata file as needed
+$ riski template json hazard
 
 # Import hazard data
 $ riski import-hazard dev metadata.json
