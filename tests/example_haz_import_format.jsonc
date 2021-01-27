@@ -1,20 +1,12 @@
 {
-    // name doesn't seem to have an related field in the schema so ignore for now
-    "name": "rdl-haz-Earthquake-88-PGA",
+    "name": "rdl-haz-Earthquake-88-PGA",  //this field is ignored - a human-understandable name for this submission
     "event_set": {
-        "the_geom": "POLYGON((0 0,1 0,1 1,0 1,0 0))",  //junk geometry, just need something for now as this cannot be null
         "description": "SWIO RAFI Madagascar Earthquake Ground Shaking",
         "creation_date": "2016-01-01",
         "bibliography": "SWIO RAFI Report https://www.gfdrr.org/en/publication/southwest-indian-ocean-risk-assessment-and-financing-initiative-summary-report-and-risk",
         "hazard_type": "EQ",
         "geographic_area_name": "Madagascar",
         "is_prob": "True"
-    },
-    "crs": {
-        "type": "name",
-        "properties": {
-            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
-        }
     },
     "contribution": {
         "model_date": "2016-01-01",
