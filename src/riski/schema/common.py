@@ -4,9 +4,10 @@ from sqlalchemy import event
 from sqlalchemy import (Column, String, Integer, Date, Enum, Float, Boolean,
                         DateTime, Interval, String, Text, ForeignKey, VARCHAR)
 from sqlalchemy.orm import relationship
-from geoalchemy2 import Geometry, Raster
+# from geoalchemy2 import Geometry, Raster
 
-from .base import Base
+from .base import Base, LiberalBoolean
+
 
 OccupancyEnum = enum.Enum('occupancy_enum', [
     ("Residential", "Residential"),
@@ -20,6 +21,13 @@ OccupancyEnum = enum.Enum('occupancy_enum', [
     ("Livestock", "Livestock"),
     ("Forestry", "Forestry"),
     ("Mixed occupancy", "Mixed occupancy")
+])
+
+ComponentEnum = enum.Enum('component_enum', [
+    ("Hazard", "Hazard"),
+    ("Exposure", "Exposure"),
+    ("Vulnerability", "Vulnerability"),
+    ("Loss", "Loss")
 ])
 
 
@@ -75,6 +83,26 @@ class ISO(Base):
 
     # Country name (in English)
     name = Column(VARCHAR, nullable=False)
+
+
+class Contribution(Base):
+    __tablename__ = 'contribution'
+    __table_args__ = ({"schema": "common"})
+
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    component = Column(Enum(ComponentEnum), nullable=False, primary_key=True)
+    set_id = Column(Integer, nullable=False, primary_key=True)
+
+    model_source = Column(VARCHAR, nullable=False)
+    model_date = Column(Date, nullable=False)
+    notes = Column(Text)
+    version = Column(VARCHAR)
+    purpose = Column(Text)
+    project = Column(VARCHAR)
+    geo_coverage = Column(VARCHAR, nullable=False)  # comma-separated ISO codes indicating regional coverage
+    contributed_at_timestamp = Column(DateTime, nullable=False)
+    license_code = Column(VARCHAR, ForeignKey("common.license.code"))
+    published = Column(LiberalBoolean, default=True)
 
 
 def load_data(filename):

@@ -42,25 +42,6 @@ class ExposureModel(Base):
     use = Column(Enum(OccupancyEnum))
 
 
-class Contribution(Base):
-    __tablename__ = 'contribution'
-    __table_args__ = ({"schema": "exposure"})
-
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-
-    exposure_model_id = Column(Integer, ForeignKey("exposure.exposure_model.id"), nullable=False)
-    model_source = Column(VARCHAR, nullable=False)
-    model_date = Column(Date, nullable=False)
-    notes = Column(Text)
-    version = Column(VARCHAR)
-    purpose = Column(Text)
-    project = Column(VARCHAR)
-    country_iso = Column(VARCHAR, ForeignKey('common.iso.code'), nullable=False)
-    contributed_at = Column(DateTime, nullable=False)
-    license_code = Column(VARCHAR, ForeignKey("common.license.code"), nullable=False)
-    published = Column(LiberalBoolean, default=True)
-
-
 class ModelCostType(Base):
     __tablename__ = 'model_cost_type'
     __table_args__ = ({"schema": "exposure"})

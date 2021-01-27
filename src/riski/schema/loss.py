@@ -38,25 +38,6 @@ LossTypeEnum = enum.Enum("loss_type_enum", [
 
 
 # Schema tables
-class Contribution(Base):
-    __tablename__ = 'Contribution'
-    __table_args__ = ({"schema": "loss"})
-
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-
-    loss_model_id = Column(Integer, ForeignKey('loss.loss_model.id'), nullable=False)
-    model_source = Column(VARCHAR, nullable=False)
-    model_date = Column(Date, nullable=False)
-    notes = Column(Text)
-    version = Column(VARCHAR)
-    purpose = Column(Text)
-    project = Column(VARCHAR)
-    country_iso = Column(VARCHAR, ForeignKey('common.iso.code'), nullable=False)
-    contributed_at = Column(DateTime, nullable=False)
-    license_code = Column(VARCHAR, ForeignKey('common.license.code'))
-    published = Column(LiberalBoolean, default=True)
-
-
 class LossModel(Base):
     __tablename__ = 'loss_model'
     __table_args__ = ({"schema": "loss"})

@@ -2,9 +2,11 @@ from sqlalchemy import (Column, String, Integer, Date, Enum, Float, Boolean,
                         DateTime, Interval, String, Text, ForeignKey, VARCHAR)
 
 from sqlalchemy.orm import relationship
-from geoalchemy2 import Geometry, Raster
+from geoalchemy2 import Geometry
 
 from .base import Base, LiberalBoolean
+
+from .common import ComponentEnum
 
 
 # Schema Tables
@@ -26,27 +28,6 @@ class EventSet(Base):
     is_prob = Column(LiberalBoolean, nullable=False)
 
     children = relationship("Event")
-
-
-class Contribution(Base):
-    __tablename__ = 'contribution'
-    __table_args__ = ({"schema": "hazard"})
-
-    id = Column('id', Integer, primary_key=True)
-    event_set_id = Column(Integer, ForeignKey('hazard.event_set.id'), nullable=False)
-
-    model_source = Column(VARCHAR, nullable=False)
-    model_date = Column(Date, nullable=False)
-    notes = Column(Text)
-    version = Column(VARCHAR)
-    purpose = Column(Text)
-    project = Column(VARCHAR)
-    country_iso = Column(VARCHAR, ForeignKey('common.iso.code'), nullable=False)
-    contributed_at_timestamp = Column(DateTime, nullable=False)
-    license_code = Column(VARCHAR, ForeignKey("common.license.code"))
-    published = Column(LiberalBoolean, default=True)
-
-    # children = relationship("EventSet")
 
 
 class Event(Base):
