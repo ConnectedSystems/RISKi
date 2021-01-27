@@ -29,19 +29,13 @@ def create_rdl_data_config(db_name: str):
 
 
 @app.command()
-def import_hazard(db_name: str, csv_fn: str, json_fn: str):
-    r_conn.switch_db(db_name)
-    r_conn.import_hazard_event(csv_fn, json_fn)
-
-
-@app.command()
-def import_hazard_exp(db_name: str, json_fn: str):
+def import_hazard(db_name: str, json_fn: str):
     """Import experimental JSON format for hazard data type."""
     if db_name != 'dev':
         print("This command only available for local dev at the moment.")
         return
     r_conn.switch_db(db_name)
-    r_conn.import_updated_hazard_json(json_fn)
+    r_conn.import_hazard_json(json_fn)
 
 
 @app.command()

@@ -15,13 +15,13 @@ import pandas.io.sql as psql
 import pandas as pd
 
 from ._utils import load_settings
-from . import _json_funcs, _xml_funcs, _local_export
+from . import hazard, _xml_funcs, _local_export
 
 
 class RDLConnection(object):
 
-    def __init__(self, settings: str, tmp_table: str = None, dev: bool = False, 
-                 db_name: Optional[str] = None, verbose=True):
+    def __init__(self, settings: str, tmp_table: str = None, # dev: bool = False, 
+                 db_name: str = None, verbose: bool = True):
         """Constructor for RDLConnection.
 
         Parameters
@@ -38,19 +38,13 @@ class RDLConnection(object):
         """
         # Load in settings
         self.settings = load_settings(settings)
-
         self.verbose = verbose
-
-        if dev:
-            warnings.warn("Dev parameter deprecated. Specify `db_name` instead.")
-            db_name = 'dev'
-
-        if (db_name is None) and (dev is False):
-            warnings.warn("In future, must specify `db_name`. Defaulting to 'rdl'.")
-            db_name = 'rdl'
+        self.current_db = None
 
         # Create settings for DB entry
         self.switch_db(db_name)
+
+        self.current_db = db_name
 
         if tmp_table is None:
             self.tmp_table = self.settings['database']['tmp_table']
@@ -58,7 +52,7 @@ class RDLConnection(object):
             self.tmp_table = tmp_table
         
         # Dynamically attach additional methods
-        funcs = inspect.getmembers(_json_funcs, inspect.isfunction)
+        funcs = inspect.getmembers(hazard, inspect.isfunction)
         funcs += inspect.getmembers(_xml_funcs, inspect.isfunction)
         funcs += inspect.getmembers(_local_export, inspect.isfunction)
         for name, func in funcs:
@@ -67,6 +61,9 @@ class RDLConnection(object):
     def switch_db(self, name: str):
         assert name in list(self.settings['database'].keys()), \
             "DB name/config not listed in settings file"
+
+        if name == self.current_db:
+            return
 
         rdl_db_settings = self.settings['database'][name]
 
@@ -95,6 +92,8 @@ class RDLConnection(object):
 
         # OS environment variable to interface with rdl-infra
         os.environ["POSTGRES_CONNECTION_STRING"] = conn_string
+
+        self.current_db = name
 
     def create_schema(self):
         from riski.schema import Base
@@ -126,53 +125,9 @@ class RDLConnection(object):
             cur.execute("DROP TABLE IF EXISTS {}".format(self.tmp_table))
 
         self.conn.commit()
-    
-    def insert_csv_data(self, csv_fn: str):
-        """Insert CSV data into temporary table.
-
-        Parameters
-        ----------
-        csv_fn : str,
-            filepath to CSV data file
-        """
-        tmp_df = pd.read_csv(csv_fn, skipinitialspace=True)
-
-        columns = tmp_df.columns.tolist()
-        self._ensure_location(columns)
-
-        # Extract datatype from DataFrame and strip numbers
-        dtypes = tmp_df.dtypes.astype(str).tolist()
-        dtypes = [re.sub('[0-9]+', '', d).replace('int', 'integer') for d in dtypes]
-
-        if len(dtypes) == 0:
-            raise ValueError("Could not determine data types!")
-
-        struct = list(zip(columns, dtypes))
-        self._create_temp_table(struct)
-
-        columns = ', '.join(columns)
-
-        with np.printoptions(threshold=np.inf):
-            # strip square brackets [] and add commas to end of lines
-            values = str(tmp_df.to_records(index=False))[1:-1].replace('\n', ',\n')
-
-        query = f"INSERT INTO {self.tmp_table}({columns}) VALUES {values}"
-
-        with self.conn.cursor() as cur:
-            cur.execute(query)
-            self._verbose_msg(f"Inserted {cur.rowcount} rows")
-
-        self.conn.commit()
-
-        return self
 
     def run_query(self, query):
         """Run an arbitrary SQL query."""
-        # with self.conn.cursor() as cur:
-        #     cur.execute(query)
-        #     columns = [desc[0] for desc in cur.description]
-        #     ret = cur.fetchall()
-        #     data = pd.DataFrame(ret, columns=columns)
 
         data = psql.read_sql_query(query, self.conn)
 
@@ -195,15 +150,15 @@ class RDLConnection(object):
         else:
             raise ValueError(f"Unknown data type: {form}")
     
-    def _ensure_location(self, columns):
-        location_id = "LocID" in columns
-        lon = "lon" in columns
-        lat = "lat" in columns
+    # def _ensure_location(self, columns):
+    #     location_id = "LocID" in columns
+    #     lon = "lon" in columns
+    #     lat = "lat" in columns
         
-        if location_id and lon and lat:
-            return
+    #     if location_id and lon and lat:
+    #         return
 
-        raise ValueError("Provided CSV does not specify LocID, lon, or lat\n{}".format(columns))
+    #     raise ValueError("Provided CSV does not specify LocID, lon, or lat\n{}".format(columns))
 
     def _verbose_msg(self, msg):
         if self.verbose:
