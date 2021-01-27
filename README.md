@@ -89,16 +89,17 @@ import riski as ri
 
 r_conn = ri.RDLConnection(".settings.yaml", db_name='dev')
 
-csv_fn = "data/CSVs/SWIO_COM_EQ_Shake_RP.csv"
 json_fn = "some_preformatted_metadata.json"
-
-r_conn.import_hazard_event(csv_fn, json_fn)
+r_conn.import_hazard_json(json_fn)
 ```
 
 
 ### As a command-line tool:
 
 ```bash
+# If setting up local DB
+$ riski setup-dev-db
+
 # Generating config files for rdl-data
 # Format is: riski [command] [database name]
 $ riski create-rdl-data-config dev
@@ -106,7 +107,7 @@ $ riski create-rdl-data-config dev
 # Edit JSON metadata file as needed
 
 # Import hazard data
-$ riski import-hazard dev some_data.csv metadata.json
+$ riski import-hazard dev metadata.json
 ```
 
 
