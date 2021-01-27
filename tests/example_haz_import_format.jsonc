@@ -9,6 +9,7 @@
         "is_prob": "True"
     },
     "contribution": {
+        "component": "Hazard",
         "model_date": "2016-01-01",
         "model_source": "AIR Worldwide",
         "notes": "This data set was produced with financial support from the European Union in the framework of the ACP-EU Natural Disaster Risk Reduction Program, managed by the Global Facility for Disaster Reduction and Recovery (GFDRR).",
@@ -16,10 +17,10 @@
         "project": "GFDRR South West Indian Ocean Risk Assessment and Financing Initiative (SWIO-RAFI)",
         "license_code": "CC BY-SA 4.0",
         "purpose": "Quantification of site specific risk of flood, earthquakes, tropical cyclones, storm surge and tsunamis, to support improvement in the resiliency and capacity of South West Indian Ocean island states through the creation of disaster risk financing strategies.",
-        "country_iso": "MDG",
+        "geo_coverage": "MDG",
         "contributed_at_timestamp": "2021-01-26"
     },
-    "events": {
+    "event": {
         "calculation_method": "SIM",
         "description": "MDG EQ Shaking, all RPs"
     },
@@ -31,10 +32,10 @@
         "uncertainty_2nd_moment": null,
         "trigger_footprint_id": null
     },
-    "import_data": [
+    "footprint_data": [
         {
             "file": "mdg_e_25.tiff",  // not real file, just used for the example
-            "format": "geotiff"  // currently does nothing. Could auto-derive from file name extension?
+            "format": "geotiff"  // Specifying file type is necessary to handle other formats
         }
     ]
 }
