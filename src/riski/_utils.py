@@ -159,3 +159,36 @@ def add_if_required(session, metadata: Dict, schema_name: str, table_name: str) 
         rec_id = l['rec_id']
 
     return rec_id
+
+
+def extract_bounds(filename, fileformat):
+    import os
+    from shapely.geometry import box
+
+    fname = filename.split(os.sep)[-1]
+    if fileformat.endswith('tiff') or fileformat.endswith('cog'):
+        import rasterio
+        # handle raster
+        # Get raster extents (maximum extent will be calculated from union)
+        with rasterio.open(filename) as src:
+            bounds = src.bounds
+            return box(*bounds)
+
+    elif fileformat.endswith('shapefile'):
+        # handle vectors
+        import geopandas as gpd
+
+        # should work with zipped shapefile collections... (to be tested)
+        # https://geopandas.readthedocs.io/en/latest/docs/user_guide/io.html
+        gdf = gpd.read_file(filename)
+
+        import ipdb
+        ipdb.set_trace()
+        
+        return box(*gdf.total_bounds)
+
+    elif fileformat.endswith('gpkg'):
+        # handle geopackages
+        pass
+
+    pass
