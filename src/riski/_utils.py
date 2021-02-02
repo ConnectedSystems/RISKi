@@ -162,6 +162,7 @@ def add_if_required(session, metadata: Dict, schema_name: str, table_name: str) 
 
 
 def extract_bounds(filename, fileformat):
+    """Get raster extents (maximum extent will be calculated from union)."""
     import os
     from shapely.geometry import box
 
@@ -174,21 +175,18 @@ def extract_bounds(filename, fileformat):
             bounds = src.bounds
             return box(*bounds)
 
-    elif fileformat.endswith('shapefile'):
+    elif fileformat.endswith('shapefile') or fileformat.endswith('gpkg'):
         # handle vectors
         import geopandas as gpd
 
         # should work with zipped shapefile collections... (to be tested)
         # https://geopandas.readthedocs.io/en/latest/docs/user_guide/io.html
-        gdf = gpd.read_file(filename)
+        fn = filename
+        if filename.endswith('.zip'):
+            fn = 'zip://'+fn+f"!{fn}.shp"
 
-        import ipdb
-        ipdb.set_trace()
+        gdf = gpd.read_file(fn)
         
         return box(*gdf.total_bounds)
-
-    elif fileformat.endswith('gpkg'):
-        # handle geopackages
-        pass
-
-    pass
+    else:
+        raise RuntimeError(f'Unsupported format: {fileformat}')

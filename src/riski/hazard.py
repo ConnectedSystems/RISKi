@@ -57,11 +57,8 @@ def import_hazard_json(self, json_metadata_fn: str):
         fileformat = entry['format']
 
         bounds = extract_bounds(filename, fileformat)
-        # # Get raster extents (maximum extent will be calculated from union)
-        # with rasterio.open(filename) as src:
-        #     bounds = src.bounds
-
-        # geoms.append(box(*bounds))
+        geoms.append(bounds)
+        
 
         uploaded_loc = f"{folder_prefix}/{fname}"
 
